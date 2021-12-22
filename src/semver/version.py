@@ -1,9 +1,13 @@
 from dataclasses import dataclass
 from typing import Optional
+from re import compile
 
 __all__ = [
     'Version'
 ]
+
+
+VERSION_REGEX = compile(r'^v?(\d+)\.(\d+)\.(\d+)(?:-(.+))?$')
 
 
 @dataclass(repr=False, order=False, frozen=True)
@@ -33,31 +37,20 @@ class Version:
     @classmethod
     def parse(cls, version: str) -> 'Version':
         """Parse version string into Version object."""
-        if version[0] == 'v':
-            version = version[1:]
+        match = VERSION_REGEX.match(version)
 
-        parts = version.split('.')
+        if match is None:
+            raise ValueError(f'Invalid version "{version}"')
 
-        if len(parts) < 3:
-            raise ValueError(f'"{version}" is not a valid version')
+        groups = match.groups()
 
-        major, minor, patchAndTag = parts[0], parts[1], parts[2:]
+        major = int(groups[0])
+        minor = int(groups[1])
+        patch = int(groups[2])
+        tag = groups[3]
 
-        patchAndTag = '.'.join(patchAndTag)
-
-        patchParts = patchAndTag.split('-')
-
-        if len(patchParts) == 1:
-            patch = patchParts[0]
-            tag = None
-        else:
-            patch, tagParts = patchParts[0], patchParts[1:]
-            tag = '-'.join(tagParts)
-
-        try:
-            major, minor, patch = int(major), int(minor), int(patch)
-        except ValueError:
-            raise ValueError(f'"{version}" is not a valid version')
+        if major == minor == patch == 0:
+            raise ValueError(f'"{version}" is invalid')
 
         return cls(major, minor, patch, tag=tag)
 

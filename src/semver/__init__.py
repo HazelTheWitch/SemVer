@@ -1,3 +1,3 @@
 from .version import *
 
-version = Version(1, 0, 0)
+version = Version(1, 1, 0)

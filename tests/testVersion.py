@@ -130,12 +130,22 @@ class TestStringAndParsing(unittest.TestCase):
         with self.assertRaises(ValueError) as ve:
             Version.parse('1.12')
 
-        self.assertEqual(str(ve.exception), '"1.12" is not a valid version')
+        self.assertEqual(str(ve.exception), 'Invalid version "1.12"')
 
         with self.assertRaises(ValueError) as ve:
             Version.parse('1.12.2.oops')
 
-        self.assertEqual(str(ve.exception), '"1.12.2.oops" is not a valid version')
+        self.assertEqual(str(ve.exception), 'Invalid version "1.12.2.oops"')
+
+        with self.assertRaises(ValueError) as ve:
+            Version.parse('0.0.0.oops')
+
+        self.assertEqual(str(ve.exception), 'Invalid version "0.0.0.oops"')
+
+        with self.assertRaises(ValueError) as ve:
+            Version.parse('0.0.0')
+
+        self.assertEqual(str(ve.exception), '"0.0.0" is invalid')
 
 
 if __name__ == '__main__':
